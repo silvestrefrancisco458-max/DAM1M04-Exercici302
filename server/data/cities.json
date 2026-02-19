@@ -1,9 +1,0 @@
-{
-  "cities": [
-    { "name": "Barcelona", "country": "ES", "population": 1620000, "coastal": true },
-    { "name": "Madrid", "country": "ES", "population": 3223000, "coastal": false },
-    { "name": "València", "country": "ES", "population": 792000, "coastal": true },
-    { "name": "Paris", "country": "FR", "population": 2148000, "coastal": false },
-    { "name": "Lisboa", "country": "PT", "population": 545000, "coastal": true }
-  ]
-}
