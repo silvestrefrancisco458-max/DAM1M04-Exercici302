@@ -1,15 +1,8 @@
 body {
-  font-family: Arial, sans-serif;
+  font-family: Arial;
   margin: 20px;
 }
 
-.menu a {
-  margin-right: 20px;
-  font-weight: bold;
-}
-
-.movie-card, .customer-card {
-  border: 1px solid #ccc;
-  padding: 10px;
-  margin-bottom: 15px;
+nav a {
+  margin-right: 15px;
 }
