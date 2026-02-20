@@ -23,7 +23,7 @@ app.set("views", path.join(__dirname, "views"));
 const db = mysql.createPool({
     host: "localhost",
     user: "root",
-    password: "",
+    password: "root",
     database: "sakila"
 });
 
