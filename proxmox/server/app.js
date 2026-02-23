@@ -35,14 +35,14 @@ app.get("/", async (req, res) => {
         const [movies] = await db.query(`
             SELECT film_id, title, release_year
             FROM film
-            LIMIT 5
+            LIMIT 5;
         `);
 
         // Obtener categorías
         const [categories] = await db.query(`
             SELECT category_id, name
             FROM category
-            LIMIT 5
+            LIMIT 5;
         `);
 
         // Renderizar la vista con los datos
@@ -128,7 +128,7 @@ app.get("/informe", async (req, res) => {
 
 // INICIAR SERVIDOR
 app.listen(PORT, () => {
-    console.log(`Servidor en http://localhost:${PORT}`);
+    console.log(`Servidor desplegado en http://fsilvestreramirez.ieti.site`);
 });
 
 // npm run dev
