@@ -23,8 +23,11 @@ app.set("views", path.join(__dirname, "views"));
 const db = mysql.createPool({
     host: "127.0.0.1",
     user: "root",
-    password: "12345", //O la otra que es tuclave
-    database: "sakila"
+    password: "1234", //O la otra que es tuclave
+    database: "sakila",
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 
 // RUTA PRINCIPAL
@@ -127,8 +130,14 @@ app.get("/informe", async (req, res) => {
 
 
 // INICIAR SERVIDOR
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
     console.log(`Servidor desplegado en http://fsilvestreramirez.ieti.site`);
 });
 
+// Primero hago esto:
+// ssh -p 20127 fsilvestreramirez@ieticloudpro.ieti.cat
+// SI hay error:
+// sudo lsof -i :3000
+// Y LUEGO
+// sudo kill -9 12345
 // npm run dev
