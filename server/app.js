@@ -21,13 +21,12 @@ app.set("views", path.join(__dirname, "views"));
 
 // MYSQL
 const db = mysql.createPool({
-    host: "127.0.0.1",
+    host: "localhost",
     user: "root",
     password: "1234", //O la otra que es tuclave
     database: "sakila",
     waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
+    connectionLimit: 10
 });
 
 // RUTA PRINCIPAL
