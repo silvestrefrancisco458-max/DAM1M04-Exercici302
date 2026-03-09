@@ -23,7 +23,7 @@ app.set("views", path.join(__dirname, "views"));
 const db = mysql.createPool({
     host: "localhost",
     user: "root",
-    password: "1234", //O la otra que es tuclave
+    password: "tuclave", //O la otra que es tuclave
     database: "sakila",
     waitForConnections: true,
     connectionLimit: 10
@@ -129,8 +129,8 @@ app.get("/informe", async (req, res) => {
 
 
 // INICIAR SERVIDOR
-app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Servidor desplegado en http://fsilvestreramirez.ieti.site`);
+app.listen(3000, "0.0.0.0", () => {
+    console.log(`Servidor desplegado en http://localhost:3000`);
 });
 
 // Primero hago esto:
