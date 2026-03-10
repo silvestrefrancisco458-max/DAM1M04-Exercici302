@@ -30,16 +30,6 @@ if (!isProxmox) {
   });
 }
 
-<<<<<<< HEAD
-// MYSQL
-const db = mysql.createPool({
-    host: "localhost",
-    user: "root",
-    password: "tuclave", //O la otra que es tuclave
-    database: "sakila",
-    waitForConnections: true,
-    connectionLimit: 10
-=======
 // Static files - ONLY ONCE
 app.use(express.static('public'))
 app.use(express.urlencoded({ extended: true }))
@@ -51,7 +41,6 @@ app.use((req, res, next) => {
   res.setHeader('Expires', '0');
   res.setHeader('Surrogate-Control', 'no-store');
   next();
->>>>>>> bd18fcf5ede842e8ccb607c87f46e56cf711b1b0
 });
 
 // Handlebars
@@ -150,48 +139,9 @@ const httpServer = app.listen(port, () => {
   console.log(`http://localhost:${port}/cursos`);
 });
 
-<<<<<<< HEAD
-// INFORME
-app.get("/informe", async (req, res) => {
-    const [customers] = await db.query(`
-        SELECT customer_id, first_name, last_name, email
-        FROM customer
-        LIMIT 10
-    `);
-
-    for (let c of customers) {
-        const [rentals] = await db.query(`
-            SELECT rental_date
-            FROM rental
-            WHERE customer_id = ?
-            LIMIT 3
-        `, [c.customer_id]);
-
-        c.rentals = rentals;
-    }
-
-    res.render("informe", { common, customers });
-});
-
-
-
-// INICIAR SERVIDOR
-app.listen(3000, "0.0.0.0", () => {
-    console.log(`Servidor desplegado en http://localhost:3000`);
-});
-
-// Primero hago esto:
-// ssh -p 20127 fsilvestreramirez@ieticloudpro.ieti.cat
-// SI hay error:
-// sudo lsof -i :3000
-// Y LUEGO
-// sudo kill -9 12345
-// npm run dev
-=======
 // Graceful shutdown
 process.on('SIGINT', async () => {
   await db.end();
   httpServer.close();
   process.exit(0);
 });
->>>>>>> bd18fcf5ede842e8ccb607c87f46e56cf711b1b0
