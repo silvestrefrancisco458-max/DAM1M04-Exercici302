@@ -17,15 +17,15 @@ if (!isProxmox) {
     host: 'localhost',
     port: 3306,
     user: 'root',
-    password: 'root',
+    password: 'tuclave',
     database: 'sakila'
   });
 } else {
   db.init({
     host: 'localhost',
     port: 3306,
-    user: 'root',
-    password: 'tuclave',
+    user: 'super',
+    password: '1234',
     database: 'sakila'
   });
 }
