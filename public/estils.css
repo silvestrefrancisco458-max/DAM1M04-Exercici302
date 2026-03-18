@@ -1,35 +1,29 @@
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  background: #f7f7f7;
+  color: #222;
 }
 
 nav {
-    background: #333;
-    padding: 10px;
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
 nav a {
-    color: white;
-    margin-right: 15px;
-    text-decoration: none;
+  text-decoration: none;
+  font-weight: bold;
+  color: #0066cc;
 }
 
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
+div {
+  background: white;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 8px;
 }
 
-.card {
-    border: 1px solid #ccc;
-    padding: 15px;
-    background: #fafafa;
-}
-
-footer {
-    text-align: center;
-    padding: 20px;
-    margin-top: 40px;
-    background: #eee;
+h1, h2, h3 {
+  margin-top: 0;
 }

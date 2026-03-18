@@ -1,28 +1,16 @@
 {{> header}}
-<body>
 {{> menu}}
 
-<main>
-    <h1>Llista de pel·lícules</h1>
+<h1>Movies</h1>
 
-    <div class="grid">
-        {{#each movies}}
-        <article class="card">
-            <h2>{{title}} ({{release_year}})</h2>
-            <img src="/imatges/{{film_id}}.png" alt="{{title}}">
-            <p><strong>Duració:</strong> {{length}} min</p>
-            <p><strong>Descripció:</strong> {{description}}</p>
-
-            <h3>Actors</h3>
-            <ul>
-                {{#each actors}}
-                <li>{{first_name}} {{last_name}}</li>
-                {{/each}}
-            </ul>
-        </article>
-        {{/each}}
-    </div>
-</main>
+{{#each movies}}
+  <div>
+    <h2>{{title}} ({{release_year}})</h2>
+    <p>{{description}}</p>
+    <p><strong>Length:</strong> {{length}} min</p>
+    <p><strong>Rating:</strong> {{rating}}</p>
+    <p><strong>Actors:</strong> {{actors}}</p>
+  </div>
+{{/each}}
 
 {{> footer}}
-</body>
