@@ -54,6 +54,12 @@ hbs.registerHelper('gt', (a, b) => a > b);
 // Partials de Handlebars
 hbs.registerPartials(path.join(__dirname, 'views', 'partials'));
 
+function loadCommonData() {
+  return JSON.parse(
+    fs.readFileSync(path.join(__dirname, 'data', 'common.json'), 'utf8')
+  );
+}
+
 // Route
 app.get('/', async (req, res) => {
   try {
