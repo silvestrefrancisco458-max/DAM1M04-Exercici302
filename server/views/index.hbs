@@ -1,21 +1,23 @@
 {{> header}}
 {{> menu}}
 
-<h1>Pàgina principal</h1>
+<main>
+  <h1>Pàgina principal</h1>
 
-<h2>Movies</h2>
-{{#each movies}}
-  <div>
-    <h3>{{title}} ({{release_year}})</h3>
-    <p><strong>Actors:</strong> {{actors}}</p>
-  </div>
-{{/each}}
-
-<h2>Categories</h2>
-<ul>
-  {{#each categories}}
-    <li>{{name}}</li>
+  <h2>Movies</h2>
+  {{#each movies}}
+    <div class="card">
+      <h3>{{title}} ({{release_year}})</h3>
+      <p><strong>Actors:</strong> {{actors}}</p>
+    </div>
   {{/each}}
-</ul>
+
+  <h2>Categories</h2>
+  <ul class="category-list">
+    {{#each categories}}
+      <li>{{name}}</li>
+    {{/each}}
+  </ul>
+</main>
 
 {{> footer}}

@@ -26,7 +26,7 @@ if (!isProxmox) {
     port: 3306,
     user: 'super',
     password: '1234',
-    database: 'escola'
+    database: 'sakila'
   });
 }
 
@@ -168,58 +168,34 @@ app.get('/customers', async (req, res) => {
   try {
     const customersRows = await db.query(`
       SELECT
-        c.customer_id,
-        c.first_name,
-        c.last_name,
-        c.email
-      FROM customer c
-      ORDER BY c.customer_id
+        customer_id,
+        first_name,
+        last_name,
+        email
+      FROM customer
+      ORDER BY customer_id
       LIMIT 25;
     `);
 
-    const rentalsRows = await db.query(`
-      SELECT
-        c.customer_id,
-        r.rental_id,
-        f.title,
-        r.rental_date
-      FROM customer c
-      JOIN rental r ON r.customer_id = c.customer_id
-      JOIN inventory i ON i.inventory_id = r.inventory_id
-      JOIN film f ON f.film_id = i.film_id
-      WHERE c.customer_id IN (
-        SELECT customer_id
-        FROM customer
-        ORDER BY customer_id
-        LIMIT 25
-      )
-      ORDER BY c.customer_id, r.rental_date
-    `);
-
-    const customers = db.table_to_json(customersRows, {
-      customer_id: 'number',
-      first_name: 'string',
-      last_name: 'string',
-      email: 'string'
-    });
-
-    const rentals = db.table_to_json(rentalsRows, {
-      customer_id: 'number',
-      rental_id: 'number',
-      title: 'string',
-      rental_date: 'string'
-    });
+    const customers = db.table_to_json(customersRows);
 
     for (const customer of customers) {
-      customer.rentals = rentals
-        .filter(r => r.customer_id === customer.customer_id)
-        .slice(0, 5);
+      const rentalsRows = await db.query(`
+        SELECT
+          f.title,
+          r.rental_date
+        FROM rental r
+        JOIN inventory i ON i.inventory_id = r.inventory_id
+        JOIN film f ON f.film_id = i.film_id
+        WHERE r.customer_id = ?
+        ORDER BY r.rental_date
+        LIMIT 5;
+      `, [customer.customer_id]);
+
+      customer.rentals = db.table_to_json(rentalsRows);
     }
 
-    res.render('customers', {
-      customers,
-      common: loadCommonData()
-    });
+    res.json(customers);
   } catch (err) {
     console.error(err);
     res.status(500).send('Error consultant la base de dades');
