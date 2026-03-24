@@ -17,7 +17,7 @@ if (!isProxmox) {
     host: 'localhost',
     port: 3306,
     user: 'root',
-    password: 'root',
+    password: 'tuclave',
     database: 'sakila'
   });
 } else {
@@ -25,7 +25,7 @@ if (!isProxmox) {
     host: 'localhost',
     port: 3306,
     user: 'root',
-    password: 'tuclave',
+    password: 'root',
     database: 'sakila'
   });
 }
