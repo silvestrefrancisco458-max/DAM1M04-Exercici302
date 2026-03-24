@@ -1,0 +1,18 @@
+{{> header}}
+{{> menu}}
+
+<main>
+  <h1>Movies</h1>
+
+  {{#each movies}}
+    <div class="card">
+      <h2>{{title}} ({{release_year}})</h2>
+      <p>{{description}}</p>
+      <p><strong>Length:</strong> {{length}} min</p>
+      <p><strong>Rating:</strong> {{rating}}</p>
+      <p><strong>Actors:</strong> {{actors}}</p>
+    </div>
+  {{/each}}
+</main>
+
+{{> footer}}
