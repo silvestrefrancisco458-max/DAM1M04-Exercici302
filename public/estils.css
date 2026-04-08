@@ -1,25 +1,36 @@
 body {
-  font-family: Arial, sans-serif;
   margin: 0;
-  background-color: #f4f4f4;
+  font-family: Arial, sans-serif;
+  background-color: #f2f2f2;
   color: #222;
 }
 
+header {
+  background-color: white;
+  border-bottom: 1px solid #ccc;
+}
+
 nav {
-  background-color: #ffffff;
-  padding: 15px 25px;
-  border-bottom: 1px solid #ddd;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 15px 20px;
+
+  display: flex;
+  gap: 30px;
 }
 
 nav a {
   text-decoration: none;
-  color: #0066cc;
+  color: #333;
   font-weight: bold;
-  margin-right: 20px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: 0.2s;
 }
 
 nav a:hover {
-  text-decoration: underline;
+  background-color: #e3f2fd;
+  color: #1565c0;
 }
 
 main {
@@ -39,7 +50,7 @@ h2 {
 
 .card {
   background-color: white;
-  border: 1px solid #ddd;
+  border: 1px solid #ccc;
   border-radius: 8px;
   padding: 15px 20px;
   margin-bottom: 15px;
@@ -50,18 +61,56 @@ h2 {
   margin-top: 0;
 }
 
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
 ul {
   padding-left: 20px;
 }
 
+li {
+  margin-bottom: 8px;
+}
+
 footer {
   max-width: 1000px;
-  margin: 40px auto 20px;
+  margin: 40px auto 20px auto;
   padding: 15px 20px;
   border-top: 1px solid #ccc;
   color: #666;
 }
 
-.category-list li {
-  margin-bottom: 8px;
+.category-list {
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 15px 20px;
+}
+
+.customer-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.customer-card {
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 15px 20px;
+}
+
+@media (max-width: 700px) {
+  .grid,
+  .customer-list {
+    grid-template-columns: 1fr;
+  }
+
+  nav a {
+    display: inline-block;
+    margin-bottom: 10px;
+  }
 }

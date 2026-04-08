@@ -1,19 +1,17 @@
 {
   "name": "dam1m04-exercici302",
   "version": "1.0.0",
+  "main": "server/app.js",
   "scripts": {
+    "start": "node server/app.js",
     "dev": "nodemon server/app.js"
   },
   "dependencies": {
+    "body-parser": "^2.2.2",
     "express": "^4.18.2",
     "express-handlebars": "^7.0.7",
     "hbs": "^4.2.0",
     "mysql2": "^3.20.0",
     "nodemon": "^3.0.2"
-  },
-  "main": "index.js",
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": ""
+  }
 }

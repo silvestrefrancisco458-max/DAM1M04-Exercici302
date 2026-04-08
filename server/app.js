@@ -14,7 +14,7 @@ const isProxmox = !!process.env.PM2_HOME;
 const db = new MySQL();
 if (!isProxmox) {
   db.init({
-    host: 'localhost',
+    host: '127.0.0.1',
     port: 3306,
     user: 'root',
     password: 'tuclave',
@@ -22,17 +22,17 @@ if (!isProxmox) {
   });
 } else {
   db.init({
-    host: 'localhost',
+    host: '127.0.0.1',
     port: 3306,
-    user: 'root',
-    password: 'root',
+    user: 'super',
+    password: '1234',
     database: 'sakila'
   });
 }
 
-// Static files - ONLY ONCE
-app.use(express.static('public'))
-app.use(express.urlencoded({ extended: true }))
+// Static files
+app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true }));
 
 // Disable cache
 app.use((req, res, next) => {
@@ -47,96 +47,170 @@ app.use((req, res, next) => {
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
-// Registrar "Helpers .hbs" aquí
 hbs.registerHelper('eq', (a, b) => a == b);
 hbs.registerHelper('gt', (a, b) => a > b);
 
-// Partials de Handlebars
 hbs.registerPartials(path.join(__dirname, 'views', 'partials'));
 
-// Route
+function getCommonData() {
+  return JSON.parse(
+    fs.readFileSync(path.join(__dirname, 'data', 'common.json'), 'utf8')
+  );
+}
+
+// Ruta /
 app.get('/', async (req, res) => {
   try {
-    // Obtenir les dades de la base de dades
-    const cursosRows = await db.query('SELECT id, nom, tematica FROM cursos ORDER BY id');
-    const especialitatsRows = await db.query('SELECT id, nom FROM especialitats ORDER BY nom');
-
-    // Transformar les dades a JSON (per les plantilles .hbs)
-    // Cal informar de les columnes i els seus tipus
-    const cursosJson = db.table_to_json(cursosRows, { id: 'number', nom: 'string', tematica: 'string' });
-    const especialitatsJson = db.table_to_json(especialitatsRows, { id: 'number', nom: 'string' });
-
-    // Llegir l'arxiu .json amb dades comunes per a totes les pàgines
-    const commonData = JSON.parse(
-      fs.readFileSync(path.join(__dirname, 'data', 'common.json'), 'utf8')
-    );
-
-    // Construir l'objecte de dades per a la plantilla
-    const data = {
-      cursos: cursosJson,
-      especialitats: especialitatsJson,
-      common: commonData
-    };
-
-    // Renderitzar la plantilla amb les dades
-    res.render('index', data);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Error consultant la base de dades');
-  }
-});
-
-app.get('/cursos', async (req, res) => {
-  try {
-
-    // Obtenir les dades de la base de dades
-    const cursosRows = await db.query(`
+    const moviesRows = await db.query(`
       SELECT
-        c.id,
-        c.nom,
-        c.tematica,
+        f.film_id,
+        f.title,
+        f.release_year,
         COALESCE(
-          GROUP_CONCAT(DISTINCT m.nom ORDER BY m.nom SEPARATOR ', '),
+          GROUP_CONCAT(
+            DISTINCT CONCAT(a.first_name, ' ', a.last_name)
+            ORDER BY a.first_name, a.last_name SEPARATOR ', '
+          ),
           '—'
-        ) AS mestre_nom
-      FROM cursos c
-      LEFT JOIN mestre_curs mc ON mc.curs_id = c.id
-      LEFT JOIN mestres m ON m.id = mc.mestre_id
-      GROUP BY c.id, c.nom, c.tematica
-      ORDER BY c.id;
+        ) AS actors
+      FROM film f
+      LEFT JOIN film_actor fa ON fa.film_id = f.film_id
+      LEFT JOIN actor a ON a.actor_id = fa.actor_id
+      GROUP BY f.film_id, f.title, f.release_year
+      ORDER BY f.film_id
+      LIMIT 5
     `);
 
-    // Transformar les dades a JSON (per les plantilles .hbs)
-    const cursosJson = db.table_to_json(cursosRows, {
-      id: 'number',
-      nom: 'string',
-      tematica: 'string',
-      mestre_nom: 'string'
+    const categoriesRows = await db.query(`
+      SELECT category_id, name
+      FROM category
+      ORDER BY category_id
+      LIMIT 5
+    `);
+
+    const moviesJson = db.table_to_json(moviesRows, {
+      film_id: 'number',
+      title: 'string',
+      release_year: 'number',
+      actors: 'string'
     });
 
-    // Llegir l'arxiu .json amb dades comunes per a totes les pàgines
-    const commonData = JSON.parse(
-      fs.readFileSync(path.join(__dirname, 'data', 'common.json'), 'utf8')
-    );
+    const categoriesJson = db.table_to_json(categoriesRows, {
+      category_id: 'number',
+      name: 'string'
+    });
 
-    // Construir l'objecte de dades per a la plantilla
-    const data = {
-      cursos: cursosJson,
-      common: commonData
-    };
-
-    // Renderitzar la plantilla amb les dades
-    res.render('cursos', data);
+    res.render('index', {
+      movies: moviesJson,
+      categories: categoriesJson,
+      common: getCommonData()
+    });
   } catch (err) {
-    console.error(err);
+    console.error('ERROR /:', err);
     res.status(500).send('Error consultant la base de dades');
   }
 });
+
+// Ruta /movies
+app.get('/movies', async (req, res) => {
+  try {
+    const moviesRows = await db.query(`
+      SELECT
+        f.film_id,
+        f.title,
+        f.release_year,
+        f.description,
+        COALESCE(
+          GROUP_CONCAT(
+            DISTINCT CONCAT(a.first_name, ' ', a.last_name)
+            ORDER BY a.first_name, a.last_name SEPARATOR ', '
+          ),
+          '—'
+        ) AS actors
+      FROM film f
+      LEFT JOIN film_actor fa ON fa.film_id = f.film_id
+      LEFT JOIN actor a ON a.actor_id = fa.actor_id
+      GROUP BY f.film_id, f.title, f.release_year, f.description
+      ORDER BY f.film_id
+      LIMIT 15
+    `);
+
+    const moviesJson = db.table_to_json(moviesRows, {
+      film_id: 'number',
+      title: 'string',
+      release_year: 'number',
+      description: 'string',
+      actors: 'string'
+    });
+
+    res.render('movies', {
+      movies: moviesJson,
+      common: getCommonData()
+    });
+  } catch (err) {
+    console.error('ERROR /movies:', err);
+    res.status(500).send('Error consultant la base de dades');
+  }
+});
+
+// Ruta /customers
+app.get('/customers', async (req, res) => {
+  try {
+    const customersRows = await db.query(`
+      SELECT
+        customer_id,
+        first_name,
+        last_name,
+        email
+      FROM customer
+      ORDER BY customer_id
+      LIMIT 25
+    `);
+
+    const customersJson = db.table_to_json(customersRows, {
+      customer_id: 'number',
+      first_name: 'string',
+      last_name: 'string',
+      email: 'string'
+    });
+
+    for (const customer of customersJson) {
+      const rentalsRows = await db.query(`
+        SELECT
+          r.rental_id,
+          r.rental_date,
+          f.title
+        FROM rental r
+        JOIN inventory i ON i.inventory_id = r.inventory_id
+        JOIN film f ON f.film_id = i.film_id
+        WHERE r.customer_id = ?
+        ORDER BY r.rental_date
+        LIMIT 5
+      `, [customer.customer_id]);
+
+      customer.rentals = db.table_to_json(rentalsRows, {
+        rental_id: 'number',
+        rental_date: 'string',
+        title: 'string'
+      });
+    }
+
+    res.render('customers', {
+      customers: customersJson,
+      common: getCommonData()
+    });
+  } catch (err) {
+    console.error('ERROR /customers:', err);
+    res.status(500).send('Error consultant la base de dades');
+  }
+});
+
 
 // Start server
 const httpServer = app.listen(port, () => {
   console.log(`http://localhost:${port}`);
-  console.log(`http://localhost:${port}/cursos`);
+  console.log(`http://localhost:${port}/movies`);
+  console.log(`http://localhost:${port}/customers`);
 });
 
 // Graceful shutdown
@@ -145,3 +219,5 @@ process.on('SIGINT', async () => {
   httpServer.close();
   process.exit(0);
 });
+
+// Para arrancar el servidor: npm run dev
