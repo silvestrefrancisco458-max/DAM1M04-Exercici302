@@ -30,11 +30,10 @@ if (!isProxmox) {
   });
 }
 
-// Static files
-app.use(express.static('public'));
+// Archivos estáticos
+app.use(express.static(path.join(__dirname, '..', 'public')));
 app.use(express.urlencoded({ extended: true }));
 
-// Disable cache
 app.use((req, res, next) => {
   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
   res.setHeader('Pragma', 'no-cache');
@@ -47,11 +46,10 @@ app.use((req, res, next) => {
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
-hbs.registerHelper('eq', (a, b) => a == b);
-hbs.registerHelper('gt', (a, b) => a > b);
-
 hbs.registerPartials(path.join(__dirname, 'views', 'partials'));
 
+
+// Leer common.json
 function getCommonData() {
   return JSON.parse(
     fs.readFileSync(path.join(__dirname, 'data', 'common.json'), 'utf8')
@@ -66,6 +64,7 @@ app.get('/', async (req, res) => {
         f.film_id,
         f.title,
         f.release_year,
+        CONCAT('/imatges/', f.film_id, '.jpg') AS image,
         COALESCE(
           GROUP_CONCAT(
             DISTINCT CONCAT(a.first_name, ' ', a.last_name)
@@ -88,28 +87,17 @@ app.get('/', async (req, res) => {
       LIMIT 5
     `);
 
-    const moviesJson = db.table_to_json(moviesRows, {
-      film_id: 'number',
-      title: 'string',
-      release_year: 'number',
-      actors: 'string'
-    });
-
-    const categoriesJson = db.table_to_json(categoriesRows, {
-      category_id: 'number',
-      name: 'string'
-    });
-
     res.render('index', {
-      movies: moviesJson,
-      categories: categoriesJson,
-      common: getCommonData()
+      common: getCommonData(),
+      movies: db.table_to_json(moviesRows),
+      categories: db.table_to_json(categoriesRows)
     });
   } catch (err) {
     console.error('ERROR /:', err);
     res.status(500).send('Error consultant la base de dades');
   }
 });
+
 
 // Ruta /movies
 app.get('/movies', async (req, res) => {
@@ -120,6 +108,7 @@ app.get('/movies', async (req, res) => {
         f.title,
         f.release_year,
         f.description,
+        CONCAT('/imatges/', f.film_id, '.jpg') AS image,
         COALESCE(
           GROUP_CONCAT(
             DISTINCT CONCAT(a.first_name, ' ', a.last_name)
@@ -135,22 +124,23 @@ app.get('/movies', async (req, res) => {
       LIMIT 15
     `);
 
-    const moviesJson = db.table_to_json(moviesRows, {
-      film_id: 'number',
-      title: 'string',
-      release_year: 'number',
-      description: 'string',
-      actors: 'string'
-    });
-
     res.render('movies', {
-      movies: moviesJson,
-      common: getCommonData()
+      common: getCommonData(),
+      movies: db.table_to_json(moviesRows)
     });
   } catch (err) {
     console.error('ERROR /movies:', err);
     res.status(500).send('Error consultant la base de dades');
   }
+});
+
+app.get('/movies/new', (req, res) => {
+  res.render('movie-form', {
+    common: getCommonData(),
+    pageTitle: 'Afegir pel·lícula',
+    action: '/movies/new',
+    movie: {}
+  });
 });
 
 // Ruta /customers
@@ -167,18 +157,13 @@ app.get('/customers', async (req, res) => {
       LIMIT 25
     `);
 
-    const customersJson = db.table_to_json(customersRows, {
-      customer_id: 'number',
-      first_name: 'string',
-      last_name: 'string',
-      email: 'string'
-    });
+    const customers = db.table_to_json(customersRows);
 
-    for (const customer of customersJson) {
+    for (const customer of customers) {
       const rentalsRows = await db.query(`
         SELECT
           r.rental_id,
-          r.rental_date,
+          DATE_FORMAT(r.rental_date, '%Y-%m-%d %H:%i') AS rental_date,
           f.title
         FROM rental r
         JOIN inventory i ON i.inventory_id = r.inventory_id
@@ -188,16 +173,12 @@ app.get('/customers', async (req, res) => {
         LIMIT 5
       `, [customer.customer_id]);
 
-      customer.rentals = db.table_to_json(rentalsRows, {
-        rental_id: 'number',
-        rental_date: 'string',
-        title: 'string'
-      });
+      customer.rentals = db.table_to_json(rentalsRows);
     }
 
     res.render('customers', {
-      customers: customersJson,
-      common: getCommonData()
+      common: getCommonData(),
+      customers
     });
   } catch (err) {
     console.error('ERROR /customers:', err);
@@ -213,7 +194,7 @@ const httpServer = app.listen(port, () => {
   console.log(`http://localhost:${port}/customers`);
 });
 
-// Graceful shutdown
+// Cierre limpio
 process.on('SIGINT', async () => {
   await db.end();
   httpServer.close();
